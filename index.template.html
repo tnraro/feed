@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+  <meta charset="utf-8">
+  <title>feed</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <style>
+    #search {
+      padding: 10px 15px;
+    }
+
+    #result-stats {
+      color: #70757a;
+      line-height: 43px;
+      font-size: 14px;
+    }
+
+    #result-error {
+      color: #f71015;
+    }
+
+    #result-list {
+      display: flex;
+      flex-flow: column;
+      gap: 30px;
+      max-width: 640px;
+    }
+
+    h3 {
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 1.3;
+      padding: 0;
+      margin: 0;
+      margin-bottom: 3px;
+      padding-top: 5px;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    cite {
+      font-size: 14px;
+      line-height: 1.3;
+      font-style: normal;
+      color: black;
+      text-decoration: none;
+    }
+
+    cite>span {
+      color: #5f6368;
+    }
+
+    .result {
+      padding: 6px 0;
+    }
+
+    time {
+      color: #70757a;
+    }
+
+    .summary {
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <label for="search">검색</label>
+  <input id="search" />
+  <fieldset oninput="changeFilter()">
+    <legend>filter</legend>
+    <input type="checkbox" id="nightworker" name="nightworker" value="나이트워커" />
+    <label for="nightworker">나이트워커</label>
+    <input type="checkbox" id="bun" name="bun" value="bun" />
+    <label for="bun">bun.sh</label>
+    <input type="checkbox" id="er" name="er" value="이터널리턴" />
+    <label for="er">이터널리턴</label>
+  </fieldset>
+  <div id="results"></div>
+  <script type="module">
+    const $search = document.querySelector("#search");
+    const $results = document.querySelector("#results");
+    const render = (results) => {
+      $results.innerHTML = `<div id="result-stats">
+        About ${results.estimatedTotalHits} results (${results.processingTimeMs} ms)
+      </div>
+      <div id="result-list">` + results.hits.map(x => `<div class="result">
+        <a href="${x.url}" target="_blank" rel="noreferrer" onClick="event.preventDefault();open(\`${x.url}#:~:text=${toText(x._formatted.content)}\`,'_blank','noopener');">
+          <cite>${x.game}<span> › ${x.category}</span></cite>
+          <h3>${x._formatted.title}</h3>
+        </a>
+        <div class="summary">
+          <time>${getRelativeTimeString(new Date(x.time))}</time>
+           — 
+          ${x.summary ?? ""} ...${x._formatted.content}...
+        </div>
+      </div>`).join("")
+        + "</div>"
+    }
+    const click = (event) => {
+      console.log(event);
+
+    }
+    const renderError = async (error) => {
+      let text = "";
+      if (error instanceof Response) {
+        const body = await error.json();
+        text = body.message;
+      }
+      $results.innerHTML = `<div id="result-error">
+      ${text}
+      </div> `;
+    }
+    const toText = (content) => {
+      const a = content.split(/[.\t\n\r?!]\s*/);
+      const p = a.at(Math.ceil(a.length / 2) - 1).trim();
+      return encodeURIComponent(p);
+    }
+    $search.addEventListener("keyup", (e) => {
+      const value = e.target.value;
+      searchInput(value);
+    });
+    let filter = [];
+    const search = async (q) => {
+      const res = await fetch("{{PUBLIC_API_ENTRYPOINT}}/indexes/feeds/search", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer {{PUBLIC_SEARCH_API_KEY}}",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          q,
+          attributesToCrop: ["title:20", "content:50"],
+          cropMarker: "",
+          filter,
+          sort: ["time:desc"],
+        }),
+      });
+      if (res.status >= 400) throw res;
+      return res.json();
+    }
+    const changeFilter = () => {
+      filter = [...document.querySelectorAll("input[type=checkbox]")]
+        .filter(x => x.checked)
+        .map(x => `game = ${x.value}`)
+        .join(" OR ");
+
+      searchInput();
+    }
+    function searchInput(s) {
+      search(s ?? $search.value)
+        .then(render)
+        .catch(renderError)
+    }
+    {
+      searchInput();
+    }
+    function getRelativeTimeString(date, locales = "ko-KR") {
+      const time = typeof date === "number" ? date : date.getTime();
+      const deltaSeconds = Math.round((time - Date.now()) / 1000);
+      const cutoffs = [60, 3600, 86400, 86400 * 7, 86400 * 30, 86400 * 365, Infinity];
+      const units = ["second", "minute", "hour", "day", "week", "month", "year", "year"];
+      const unitIndex = cutoffs.findIndex(cutoffs => cutoffs > Math.abs(deltaSeconds));
+      const divider = unitIndex ? cutoffs[unitIndex - 1] : 1;
+      const rtf = new Intl.RelativeTimeFormat(locales, { numeric: "auto" });
+      return rtf.format(Math.floor(deltaSeconds / divider), units[unitIndex]);
+    }
+  </script>
+</body>
+
+</html>
