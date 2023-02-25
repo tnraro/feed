@@ -3,7 +3,7 @@ import { MeiliSearch } from "meilisearch";
 
 const client = new MeiliSearch({
   host: "http://localhost:7700",
-  apiKey: Bun.env.API_KEY,
+  apiKey: Bun.env.MEILI_MASTER_KEY,
 });
 
 await client.health();
