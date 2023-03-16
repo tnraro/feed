@@ -201,7 +201,7 @@
       const unitIndex = cutoffs.findIndex(cutoffs => cutoffs > Math.abs(deltaSeconds));
       const divider = unitIndex ? cutoffs[unitIndex - 1] : 1;
       const rtf = new Intl.RelativeTimeFormat(locales, { numeric: "auto" });
-      return rtf.format(Math.floor(deltaSeconds / divider), units[unitIndex]);
+      return rtf.format(Math.ceil(deltaSeconds / divider), units[unitIndex]);
     }
   </script>
 </body>
