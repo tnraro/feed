@@ -93,6 +93,7 @@ function isPage(context: PageContext): context is PageDocument {
   if (typeof context.url !== "string") return false;
   if (typeof context.title !== "string") return false;
   if (typeof context.content !== "string") return false;
+  if (typeof context.time !== "number") return false;
   if (!(context.summary == null || typeof context.summary === "string")) return false;
   return true;
 }

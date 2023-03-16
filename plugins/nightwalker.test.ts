@@ -43,7 +43,7 @@ describe("nightwalker:page", () => {
     const res = await fetch("https://nightwalker.nexon.com/news/devnote/Detail?page=1&articlesn=2");
     const body = await res.text();
     const parsedBody = parse(body);
-    expect(parsedBody.time).toBe("2023-02-02T01:16:00.000Z");
+    expect(parsedBody.time).toBe(1675300560000);
     expect(parsedBody.content.slice(100, 150)).toBe(snapshots[0]);
   });
 });

@@ -9,7 +9,7 @@ export interface PageDocument {
   category: string;
   url: string;
   title: string;
-  time: string;
+  time: number;
   summary?: string;
   content: string;
 }

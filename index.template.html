@@ -81,12 +81,25 @@
   <input id="search" />
   <fieldset oninput="changeFilter()">
     <legend>filter</legend>
-    <input type="checkbox" id="nightworker" name="nightworker" value="나이트워커" />
-    <label for="nightworker">나이트워커</label>
-    <input type="checkbox" id="bun" name="bun" value="bun" />
-    <label for="bun">bun.sh</label>
-    <input type="checkbox" id="er" name="er" value="이터널리턴" />
-    <label for="er">이터널리턴</label>
+    <div>
+      <input type="checkbox" id="nightworker" name="nightworker" value="나이트워커" />
+      <label for="nightworker">나이트워커</label>
+      <input type="checkbox" id="bun" name="bun" value="bun" />
+      <label for="bun">bun.sh</label>
+      <input type="checkbox" id="er" name="er" value="이터널리턴" />
+      <label for="er">이터널리턴</label>
+    </div>
+    <div>
+      <label for="time-range">기간</label>
+      <select id="time-range">
+        <option value="">전체 기간</option>
+        <option value="1">한 시간 전까지</option>
+        <option value="24">24시간 전까지</option>
+        <option value="168">일주일 전까지</option>
+        <option value="720">한 달 전까지</option>
+        <option value="8760">일 년 전까지</option>
+      </select>
+    </div>
   </fieldset>
   <div id="results"></div>
   <script>
@@ -152,10 +165,23 @@
       return res.json();
     }
     const changeFilter = () => {
-      filter = [...document.querySelectorAll("input[type=checkbox]")]
-        .filter(x => x.checked)
-        .map(x => `game = ${x.value}`)
-        .join(" OR ");
+      const timeRangeValue = Number(document.querySelector("#time-range").value);
+      const timeRangeFilter = (timeRangeValue <= 0 || !Number.isSafeInteger(timeRangeValue))
+        ? undefined
+        : `time >= ${((Date.now() / 3600000 | 0) - Number(timeRangeValue)) * 3600000}`;
+      const categories = [...document.querySelectorAll("input[type=checkbox]")]
+        .filter(x => x.checked);
+      const categoryFilter = categories.length === 0
+        ? undefined
+        : categories
+          .map(x => `game = ${x.value}`)
+          .join(" OR ");
+      filter = [
+        categoryFilter,
+        timeRangeFilter,
+      ].filter(x => x != null)
+        .map(x => `(${x})`)
+        .join(" AND ")
 
       searchInput();
     }

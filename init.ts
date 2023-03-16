@@ -11,7 +11,7 @@ await client.health();
 const feeds = client.index("feeds");
 feeds.updateSettings({
   searchableAttributes: ["content", "summary", "title", "game", "category"],
-  filterableAttributes: ["game", "category"],
+  filterableAttributes: ["game", "category", "time"],
   sortableAttributes: ["time"],
 });
 

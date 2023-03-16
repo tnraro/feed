@@ -18,7 +18,7 @@ export const erListParserPlugin = [
           url: x.url,
           title: x.i18ns.ko_KR.title.trim(),
           category: categoryIdToNameMap.get(x.category_id)!,
-          time: x.created_at,
+          time: new Date(x.created_at).getTime(),
           summary: x.i18ns.ko_KR.summary.trim(),
         })) as Pick<PageDocument, "url" | "title" | "category" | "time" | "summary">[],
       next

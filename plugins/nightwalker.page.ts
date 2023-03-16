@@ -5,7 +5,7 @@ export const nightwalkerPageParserPlugin = [
   /https:\/\/nightwalker\.nexon\.com\/news\/[^/]+\/detail/i,
   (body: string) => {
     const $ = load(body);
-    const time = new Date($(".time").text().trim()).toISOString();
+    const time = new Date($(".time").text().trim()).getTime();
     const content = $(".view_contents").text().trim();
     return {
       time,

@@ -10,7 +10,7 @@ export const bunListParserPlugin = [
         return {
           url: x.attribs.href,
           title: $(x).find("div.text-2xl").text().trim(),
-          time: new Date($(x).find("span.text-gray-600:nth-child(2)").text().trim()).toISOString(),
+          time: new Date($(x).find("span.text-gray-600:nth-child(2)").text().trim()).getTime(),
           summary: $(x).find("p.text-lg").text().trim(),
         }
       })
