@@ -1,13 +1,19 @@
-import { test, describe, expect } from "bun:test";
+import { test, describe, expect, beforeEach, afterEach } from "bun:test";
 import { Database } from "bun:sqlite";
 import { Model } from "./model";
 
+let model: Model;
+beforeEach(() => {
+  const db = new Database();
+  model = new Model(db);
+  model.init();
+});
+afterEach(() => {
+  model[Symbol.dispose]();
+});
+
 describe("FeedConfig", () => {
   test("init", () => {
-    using db = new Database();
-    using model = new Model(db);
-    model.init();
-
     model.setFeedConfig({
       id: "id",
       name: "name",
@@ -21,10 +27,6 @@ describe("FeedConfig", () => {
   });
 
   test("update", () => {
-    using db = new Database();
-    using model = new Model(db);
-    model.init();
-
     model.setFeedConfig({ id: "id", name: "name", link: "link", interval: 53, });
     model.setFeedConfig({ id: "id", name: "renamed", link: "link 2", interval: 64, });
 
@@ -34,10 +36,6 @@ describe("FeedConfig", () => {
   })
 
   test("deny same link", () => {
-    using db = new Database();
-    using model = new Model(db);
-    model.init();
-
     model.setFeedConfig({ id: "id", name: "name", link: "link", interval: 53, });
 
     expect(() => {
@@ -49,10 +47,6 @@ describe("FeedConfig", () => {
 
 describe("Feed", () => {
   test("init", () => {
-    using db = new Database();
-    using model = new Model(db);
-    model.init();
-
     model.setFeed({
       id: "id",
       title: "title",
@@ -65,10 +59,6 @@ describe("Feed", () => {
   });
 
   test("insertion", () => {
-    using db = new Database();
-    using model = new Model(db);
-    model.init();
-
     model.setFeed({ id: "id", title: "name", link: "link", description: "123" });
     model.setFeed({ id: "id2", title: "renamed", link: "link 2", createdAt: new Date(0) });
 
