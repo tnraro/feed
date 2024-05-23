@@ -64,13 +64,23 @@ export class Model {
       });
   }
   feedConfigs() {
-    return this.db.query(`
+    return this.db.query<{
+      id: string,
+      name: string,
+      link: string,
+      interval: number,
+    }, []>(`
       select id, name, link, interval from FeedConfig
     `)
       .all();
   }
   feedConfig(id: string) {
-    return this.db.query(`
+    return this.db.query<{
+      id: string,
+      name: string,
+      link: string,
+      interval: number,
+    }, { $id: string }>(`
       select id, name, link, interval from FeedConfig
       where id=$id
     `)
@@ -91,7 +101,16 @@ export class Model {
       })
   }
   feeds() {
-    return this.db.query(`
+    return this.db.query<
+      {
+        id: string,
+        title: string,
+        link: string,
+        description: string | null,
+        createdAt: string | null,
+        feedConfigId: string,
+      }, []
+    >(`
       select id, title, link, description, createdAt, feedConfigId from Feed
     `)
       .all();
