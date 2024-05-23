@@ -66,5 +66,13 @@ describe("Feed", () => {
       { id: "id", title: "name", link: "link", description: "123", createdAt: null, },
       { id: "id2", title: "renamed", link: "link 2", description: null, createdAt: new Date(0).toISOString() },
     ]);
+  });
+
+  test("conflict", () => {
+    model.setFeed({ id: "id", title: "name", link: "link", description: "123" });
+
+    expect(() => {
+      model.setFeed({ id: "id", title: "renamed", link: "link 2", createdAt: new Date(0) });
+    }).toThrowError("UNIQUE constraint failed: Feed.id")
   })
 });
