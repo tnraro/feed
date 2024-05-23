@@ -42,6 +42,18 @@ describe("FeedConfig", () => {
       model.setFeedConfig({ id: "id2", name: "renamed", link: "link", interval: 64, });
     }).toThrowError("UNIQUE constraint failed: FeedConfig.link")
   });
+
+  test("get feed config by id", () => {
+    model.setFeedConfig({ id: "id", name: "name", link: "link", interval: 53, });
+    model.setFeedConfig({ id: "id2", name: "name2", link: "link2", interval: 64, });
+
+    expect(model.feedConfig("id")).toStrictEqual({
+      id: "id", name: "name", link: "link", interval: 53,
+    });
+    expect(model.feedConfig("id2")).toStrictEqual({
+      id: "id2", name: "name2", link: "link2", interval: 64,
+    });
+  });
 });
 
 

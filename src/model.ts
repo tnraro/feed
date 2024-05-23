@@ -69,6 +69,13 @@ export class Model {
     `)
       .all();
   }
+  feedConfig(id: string) {
+    return this.db.query(`
+      select id, name, link, interval from FeedConfig
+      where id=$id
+    `)
+      .get({ $id: id });
+  }
   setFeed(feed: Feed) {
     this.db.query(`
       insert into Feed (id, title, link, description, createdAt, feedConfigId)
