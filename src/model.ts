@@ -7,6 +7,14 @@ export interface FeedConfig {
   interval: number;
 }
 
+export interface Feed {
+  id: string,
+  title: string,
+  link: string,
+  description?: string,
+  createdAt?: Date,
+}
+
 export class Model {
   db;
   #disposed = false;
@@ -53,6 +61,25 @@ export class Model {
   feedConfigs() {
     return this.db.query(`
       select id, name, link, interval from FeedConfig
+    `)
+      .all();
+  }
+  setFeed(feed: Feed) {
+    this.db.query(`
+      insert into Feed (id, title, link, description, createdAt)
+      values ($id, $title, $link, $description, $createdAt)
+    `)
+      .run({
+        $id: feed.id,
+        $title: feed.title,
+        $link: feed.link,
+        $description: feed.description ?? null,
+        $createdAt: feed.createdAt?.toISOString() ?? null,
+      })
+  }
+  feeds() {
+    return this.db.query(`
+      select id, title, link, description, createdAt from Feed
     `)
       .all();
   }

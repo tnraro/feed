@@ -45,3 +45,36 @@ describe("FeedConfig", () => {
     }).toThrowError("UNIQUE constraint failed: FeedConfig.link")
   });
 });
+
+
+describe("Feed", () => {
+  test("init", () => {
+    using db = new Database();
+    using model = new Model(db);
+    model.init();
+
+    model.setFeed({
+      id: "id",
+      title: "title",
+      link: "link",
+    });
+
+    expect(model.feeds()).toStrictEqual([
+      { id: "id", title: "title", link: "link", createdAt: null, description: null },
+    ]);
+  });
+
+  test("insertion", () => {
+    using db = new Database();
+    using model = new Model(db);
+    model.init();
+
+    model.setFeed({ id: "id", title: "name", link: "link", description: "123" });
+    model.setFeed({ id: "id2", title: "renamed", link: "link 2", createdAt: new Date(0) });
+
+    expect(model.feeds()).toStrictEqual([
+      { id: "id", title: "name", link: "link", description: "123", createdAt: null, },
+      { id: "id2", title: "renamed", link: "link 2", description: null, createdAt: new Date(0).toISOString() },
+    ]);
+  })
+});
