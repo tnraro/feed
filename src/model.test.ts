@@ -46,33 +46,37 @@ describe("FeedConfig", () => {
 
 
 describe("Feed", () => {
+  beforeEach(() => {
+    model.setFeedConfig({ id: "config", name: "config", link: "link", interval: 53 });
+  });
   test("init", () => {
     model.setFeed({
       id: "id",
       title: "title",
       link: "link",
+      feedConfigId: "config"
     });
 
     expect(model.feeds()).toStrictEqual([
-      { id: "id", title: "title", link: "link", createdAt: null, description: null },
+      { id: "id", title: "title", link: "link", createdAt: null, description: null, feedConfigId: "config" },
     ]);
   });
 
   test("insertion", () => {
-    model.setFeed({ id: "id", title: "name", link: "link", description: "123" });
-    model.setFeed({ id: "id2", title: "renamed", link: "link 2", createdAt: new Date(0) });
+    model.setFeed({ id: "id", title: "name", link: "link", description: "123", feedConfigId: "config" });
+    model.setFeed({ id: "id2", title: "renamed", link: "link 2", createdAt: new Date(0), feedConfigId: "config" });
 
     expect(model.feeds()).toStrictEqual([
-      { id: "id", title: "name", link: "link", description: "123", createdAt: null, },
-      { id: "id2", title: "renamed", link: "link 2", description: null, createdAt: new Date(0).toISOString() },
+      { id: "id", title: "name", link: "link", description: "123", createdAt: null, feedConfigId: "config", },
+      { id: "id2", title: "renamed", link: "link 2", description: null, createdAt: new Date(0).toISOString(), feedConfigId: "config" },
     ]);
   });
 
   test("conflict", () => {
-    model.setFeed({ id: "id", title: "name", link: "link", description: "123" });
+    model.setFeed({ id: "id", title: "name", link: "link", description: "123", feedConfigId: "config" });
 
     expect(() => {
-      model.setFeed({ id: "id", title: "renamed", link: "link 2", createdAt: new Date(0) });
+      model.setFeed({ id: "id", title: "renamed", link: "link 2", createdAt: new Date(0), feedConfigId: "config" });
     }).toThrowError("UNIQUE constraint failed: Feed.id")
   })
 });

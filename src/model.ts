@@ -9,6 +9,7 @@ export interface FeedConfig {
 
 export interface Feed {
   id: string,
+  feedConfigId: string,
   title: string,
   link: string,
   description?: string,
@@ -24,6 +25,7 @@ export class Model {
   init() {
     if (this.#disposed) return;
     this.db.exec("PRAGMA journal_mode = WAL;");
+    this.db.exec("PRAGMA foreign_keys = ON;");
     this.db.exec(`
     create table if not exists FeedConfig (
       id text primary key,
@@ -37,7 +39,10 @@ export class Model {
       title text not null,
       link text not null unique,
       description text,
-      createdAt text
+      createdAt text,
+      feedConfigId text references FeedConfig (id)
+        on update cascade
+        on delete cascade
     ) without rowid;
     `);
   }
@@ -66,8 +71,8 @@ export class Model {
   }
   setFeed(feed: Feed) {
     this.db.query(`
-      insert into Feed (id, title, link, description, createdAt)
-      values ($id, $title, $link, $description, $createdAt)
+      insert into Feed (id, title, link, description, createdAt, feedConfigId)
+      values ($id, $title, $link, $description, $createdAt, $feedConfigId)
     `)
       .run({
         $id: feed.id,
@@ -75,11 +80,12 @@ export class Model {
         $link: feed.link,
         $description: feed.description ?? null,
         $createdAt: feed.createdAt?.toISOString() ?? null,
+        $feedConfigId: feed.feedConfigId,
       })
   }
   feeds() {
     return this.db.query(`
-      select id, title, link, description, createdAt from Feed
+      select id, title, link, description, createdAt, feedConfigId from Feed
     `)
       .all();
   }
