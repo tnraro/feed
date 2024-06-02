@@ -1,0 +1,24 @@
+diff --git a/node_modules/domutils/lib/esm/feeds.js b/node_modules/domutils/lib/esm/feeds.js
+index df0210a..0ebe3c5 100644
+--- a/node_modules/domutils/lib/esm/feeds.js
++++ b/node_modules/domutils/lib/esm/feeds.js
+@@ -32,7 +32,8 @@ function getAtomFeed(feedRoot) {
+             const entry = { media: getMediaElements(children) };
+             addConditionally(entry, "id", "id", children);
+             addConditionally(entry, "title", "title", children);
+-            const href = (_a = getOneElement("link", children)) === null || _a === void 0 ? void 0 : _a.attribs["href"];
++            const links = getElementsByTagName("link", children, true);
++            const href = (links.find(e => e.attribs.type === "text/html") ?? links[0])?.attribs["href"];
+             if (href) {
+                 entry.link = href;
+             }
+@@ -49,7 +50,8 @@ function getAtomFeed(feedRoot) {
+     };
+     addConditionally(feed, "id", "id", childs);
+     addConditionally(feed, "title", "title", childs);
+-    const href = (_a = getOneElement("link", childs)) === null || _a === void 0 ? void 0 : _a.attribs["href"];
++    const links = getElementsByTagName("link", childs, true);
++    const href = (links.find(e => e.attribs.type === "text/html") ?? links[0])?.attribs["href"];
+     if (href) {
+         feed.link = href;
+     }
