@@ -1,12 +1,12 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { inArray } from "drizzle-orm";
 import { db } from "../../db/db";
-import { articles, senders, sendersToSources, sources } from "../../db/schema";
+import { addArticles, getNotSentArticlesOfSource } from "../../db/models/articles";
+import { getSendersOfSource } from "../../db/models/senders";
+import { getSource } from "../../db/models/sources";
+import { articles } from "../../db/schema";
+import type { InsertArticle, SelectArticle, SelectSource } from "../../db/types";
 import { sendTo } from "../../senders";
 import { fetchSource } from "../../sources";
-import type { InsertArticle, SelectArticle, SelectSource } from "../../db/types";
-import { getSource } from "../../db/models/sources";
-import { getSendersOfSource } from "../../db/models/senders";
-import { addArticles, getNotSentArticlesOfSource } from "../../db/models/articles";
 
 export async function update(sourceId: string) {
   const source = (await getSource(sourceId))[0];
