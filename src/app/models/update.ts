@@ -5,6 +5,7 @@ import { sendTo } from "../../senders";
 import { fetchSource } from "../../sources";
 import type { InsertArticle, SelectArticle, SelectSource } from "../../db/types";
 import { getSource } from "../../db/models/sources";
+import { getSendersOfSource } from "../../db/models/senders";
 
 export async function update(sourceId: string) {
   const source = (await getSource(sourceId))[0];
@@ -24,16 +25,10 @@ export async function update(sourceId: string) {
   return result;
 
   async function sendArticles(source: SelectSource, articles: SelectArticle[]) {
-    return await Promise.allSettled((await senderz(source.id))
-      .map(group => group.senders)
-      .filter(<T>(sender: T | null | undefined): sender is T => sender != null)
-      .map(sender => sendTo(sender, source, articles)));
-  }
-
-  async function senderz(sourceId: string) {
-    return await db.select().from(sendersToSources)
-      .leftJoin(senders, eq(sendersToSources.senderId, senders.id))
-      .where(eq(sendersToSources.sourceId, sourceId));
+    return await Promise.allSettled(
+      getSendersOfSource(sourceId)
+        .map(sender => sendTo(sender, source, articles))
+    );
   }
 
   async function markAsSent(sourceId: string, updates: { sourceId: string | null, id: string }[]) {
