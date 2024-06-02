@@ -6,7 +6,7 @@ import { fetchSource } from "../../sources";
 import type { InsertArticle, SelectArticle, SelectSource } from "../../db/types";
 import { getSource } from "../../db/models/sources";
 import { getSendersOfSource } from "../../db/models/senders";
-import { addArticles } from "../../db/models/articles";
+import { addArticles, getNotSentArticlesOfSource } from "../../db/models/articles";
 
 export async function update(sourceId: string) {
   const source = (await getSource(sourceId))[0];
@@ -14,7 +14,7 @@ export async function update(sourceId: string) {
 
   await insertArticles(await fetchSource(source));
 
-  const updates = await getNotSentArticlesBySourceId(source.id);
+  const updates = await getNotSentArticlesOfSource(source.id);
   if (updates.length === 0) return [];
 
   const result = await sendArticles(source, updates);
@@ -46,10 +46,6 @@ export async function update(sourceId: string) {
       .map(r => r.value);
   }
 
-  async function getNotSentArticlesBySourceId(sourceId: string) {
-    return await db.select().from(articles)
-      .where(and(eq(articles.sourceId, sourceId), eq(articles.isSent, false)));
-  }
   async function insertArticles(items: InsertArticle[], markAsSent = false) {
     if (items.length <= 0) return;
 
