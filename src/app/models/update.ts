@@ -6,6 +6,7 @@ import { fetchSource } from "../../sources";
 import type { InsertArticle, SelectArticle, SelectSource } from "../../db/types";
 import { getSource } from "../../db/models/sources";
 import { getSendersOfSource } from "../../db/models/senders";
+import { addArticles } from "../../db/models/articles";
 
 export async function update(sourceId: string) {
   const source = (await getSource(sourceId))[0];
@@ -56,7 +57,7 @@ export async function update(sourceId: string) {
       ...item,
       isSent: markAsSent,
     }));
-    await db.insert(articles).values(values).onConflictDoNothing();
+    return await addArticles(values);
   }
 }
 
