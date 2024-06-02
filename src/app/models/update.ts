@@ -4,9 +4,10 @@ import { articles, senders, sendersToSources, sources } from "../../db/schema";
 import { sendTo } from "../../senders";
 import { fetchSource } from "../../sources";
 import type { InsertArticle, SelectArticle, SelectSource } from "../../db/types";
+import { getSource } from "../../db/models/sources";
 
 export async function update(sourceId: string) {
-  const source = getSource(sourceId);
+  const source = (await getSource(sourceId))[0];
   if (source == null) throw new Error(`No such source: "${sourceId}"`);
 
   await insertArticles(await fetchSource(source));
@@ -21,12 +22,6 @@ export async function update(sourceId: string) {
   }
 
   return result;
-
-  function getSource(sourceId: string) {
-    return db.select().from(sources)
-      .where(eq(sources.id, sourceId))
-      .get();
-  }
 
   async function sendArticles(source: SelectSource, articles: SelectArticle[]) {
     return await Promise.allSettled((await senderz(source.id))
