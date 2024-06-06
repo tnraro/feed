@@ -1,0 +1,32 @@
+{
+  "name": "feed",
+  "module": "src/index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/turndown": "^5.0.4",
+    "drizzle-kit": "^0.22.1",
+    "patch-package": "^8.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@elysiajs/server-timing": "^1.0.2",
+    "@elysiajs/swagger": "^1.0.5",
+    "drizzle-orm": "^0.31.0",
+    "drizzle-typebox": "^0.1.1",
+    "elysia": "^1.0.22",
+    "htmlparser2": "^9.1.0",
+    "turndown": "^7.2.0"
+  },
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --target=bun --minify-identifiers --minify-syntax --outdir=./out --sourcemap=external",
+    "start": "NODE_ENV=production bun out/index.js",
+    "test": "bun test",
+    "migrate": "bun run migrate.ts",
+    "generate": "drizzle-kit generate",
+    "postinstall": "patch-package"
+  }
+}
